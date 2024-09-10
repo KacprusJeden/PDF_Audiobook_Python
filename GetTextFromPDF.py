@@ -1,5 +1,4 @@
-from io import StringIO
-from pdfminer.high_level import extract_text
+from PyPDF2 import PdfReader
 from tkinter import filedialog
 
 class ExtendFileExcpetion(Exception):
@@ -15,12 +14,16 @@ def choosePath():
 def extractTextFromPdf(choosenPath):
     try:
         if choosenPath is not None:
-            with open(choosenPath, "rb") as file:
-                text = extract_text(file)
-                text = text.encode("utf-8")
-                text = text.decode("utf-8")
-                text = StringIO(text)
-            return text.read()
+            text = ''
+            reader = PdfReader(choosenPath)
+
+            for num in range(len(reader.pages)):
+                text += f'strona {num + 1} \n\n'
+                page = reader.pages[num]
+                text += f'{page.extract_text()} \n\n'
+
+            return text
+
         else:
             raise FileNotFoundError
     except FileNotFoundError:
